@@ -368,9 +368,10 @@ def dB_map_2D(block_det=None, choose_axis=2, interpolation="spline16"):
             if peakVal in x
         ],
     )
-    a = 10 * log10([[y / minVal for y in x] for x in a])
+    # a = 10 * log10([[y / minVal for y in x] for x in a])
+    a = ([[y / minVal for y in x] for x in a])**2
 
-    plt.title("dB map of Electrical waves in detector region")
+    plt.title("dB map of Electrical waves in detector regio")
     plt.imshow(a, cmap="inferno", interpolation=interpolation)
     cbar = plt.colorbar()
     cbar.ax.set_ylabel("dB scale", rotation=270)
