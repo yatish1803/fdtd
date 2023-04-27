@@ -9,7 +9,10 @@ imported by the Grid class and hence are available as Grid methods.
 import os
 
 # plotting
+import matplotlib
+matplotlib.use('TkAgg',force=True)
 import matplotlib.pyplot as plt
+print("Switched to:",matplotlib.get_backend())
 import matplotlib.patches as ptc
 from matplotlib.colors import LogNorm
 
