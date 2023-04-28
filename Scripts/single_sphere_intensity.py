@@ -60,6 +60,7 @@ grid[50:250, 60:400, 0] = fdtd.BlockDetector(name="detector")
 x = y = np.linspace(-1,1,100)
 X, Y = np.meshgrid(x, y)
 circle_mask = X**2 + Y**2 < 1
+circle_mask.shape
 permittivity = np.ones((100,100,1))
 permittivity += circle_mask[:,:,None]*(refractive_index**2 - 1)
 grid[100:200, 100:200, 0] = fdtd.Object(permittivity=permittivity, name="object")

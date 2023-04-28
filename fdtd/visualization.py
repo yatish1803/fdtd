@@ -363,16 +363,17 @@ def intensity_map_2D(block_det, permittivity, c, choose_axis=2, interpolation="s
             a[i].append(max(temp) - min(temp))
 
     peakVal, minVal = max(map(max, a)), min(map(min, a))
-    print(
-        "Peak at:",
-        [
-            [[i, j] for j, y in enumerate(x) if y == peakVal]
-            for i, x in enumerate(a)
-            if peakVal in x
-        ],
-    )
+    # print(
+    #     "Peak at:",
+    #     [
+    #         [[i, j] for j, y in enumerate(x) if y == peakVal]
+    #         for i, x in enumerate(a)
+    #         if peakVal in x
+    #     ],
+    # )
     # a = 10 * log10([[y / minVal for y in x] for x in a])
-    a = 0.5 * squeeze(permittivity) * c * power([[y / minVal for y in x] for x in a], 2)
+    ef_sq = power([[y / minVal for y in x] for x in a], 2)
+    a = 0.5 * c * permittivity * ef_sq
     plt.title("Intensity map in detector region")
     plt.imshow(a, cmap="inferno")  # , interpolation=interpolation)
     cbar = plt.colorbar()
@@ -412,17 +413,17 @@ def dB_map_2D(block_det=None, choose_axis=2, interpolation="spline16"):
             a[i].append(max(temp) - min(temp))
 
     peakVal, minVal = max(map(max, a)), min(map(min, a))
-    print(
-        "Peak at:",
-        [
-            [[i, j] for j, y in enumerate(x) if y == peakVal]
-            for i, x in enumerate(a)
-            if peakVal in x
-        ],
-    )
+    # print(
+    #     "Peak at:",
+    #     [
+    #         [[i, j] for j, y in enumerate(x) if y == peakVal]
+    #         for i, x in enumerate(a)
+    #         if peakVal in x
+    #     ],
+    # )
     a = 10 * log10([[y / minVal for y in x] for x in a])
 
-    plt.title("dB map of Electrical waves in detector region")
+    plt.title("dB map of Electrical field in detector region")
     plt.imshow(a, cmap="inferno", interpolation=interpolation)
     cbar = plt.colorbar()
     cbar.ax.set_ylabel("dB scale", rotation=270)
