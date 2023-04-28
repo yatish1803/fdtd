@@ -173,7 +173,6 @@ class Grid:
         """transform a distance to an integer number of gridpoints"""
         if not isinstance(distance, int):
             return int(float(distance) / self.grid_spacing + 0.5)
-        print(distance)
         return distance
 
     def _handle_time(self, time: Number) -> int:
