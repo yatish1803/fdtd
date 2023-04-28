@@ -25,6 +25,7 @@ from .typing_ import Tuple, Number, Tensorlike
 from .backend import backend as bd
 from . import constants as const
 
+
 ## Functions
 def curl_E(E: Tensorlike) -> Tensorlike:
     """Transforms an E-type field into an H-type field by performing a curl
@@ -88,12 +89,12 @@ class Grid:
     from .visualization import visualize
 
     def __init__(
-        self,
-        shape: Tuple[Number, Number, Number],
-        grid_spacing: float = 155e-9,
-        permittivity: float = 1.0,
-        permeability: float = 1.0,
-        courant_number: float = None,
+            self,
+            shape: Tuple[Number, Number, Number],
+            grid_spacing: float = 155e-9,
+            permittivity: float = 1.0,
+            permeability: float = 1.0,
+            courant_number: float = None,
     ):
         """
         Args:
@@ -172,6 +173,7 @@ class Grid:
         """transform a distance to an integer number of gridpoints"""
         if not isinstance(distance, int):
             return int(float(distance) / self.grid_spacing + 0.5)
+        print(distance)
         return distance
 
     def _handle_time(self, time: Number) -> int:
@@ -181,7 +183,7 @@ class Grid:
         return time
 
     def _handle_tuple(
-        self, shape: Tuple[Number, Number, Number]
+            self, shape: Tuple[Number, Number, Number]
     ) -> Tuple[int, int, int]:
         """validate the grid shape and transform to a length-3 tuple of ints"""
         if len(shape) != 3:
@@ -410,17 +412,17 @@ class Grid:
         makedirs("fdtd_output", exist_ok=True)  # Output master folder declaration
         # making full_sim_name with timestamp
         full_sim_name = (
-            str(datetime.now().year)
-            + "-"
-            + str(datetime.now().month)
-            + "-"
-            + str(datetime.now().day)
-            + "-"
-            + str(datetime.now().hour)
-            + "-"
-            + str(datetime.now().minute)
-            + "-"
-            + str(datetime.now().second)
+                str(datetime.now().year)
+                + "-"
+                + str(datetime.now().month)
+                + "-"
+                + str(datetime.now().day)
+                + "-"
+                + str(datetime.now().hour)
+                + "-"
+                + str(datetime.now().minute)
+                + "-"
+                + str(datetime.now().second)
         )
         # Simulation name (optional)
         if sim_name is not None:
