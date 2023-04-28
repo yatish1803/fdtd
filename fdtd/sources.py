@@ -200,7 +200,9 @@ class LineSource:
             bd.float,
         )
 
-        self.profile = bd.exp(-(vect ** 2) / (2 * (0.5 * vect.max()) ** 2))
+        # self.profile = bd.exp(-(vect ** 2) / (2 * (0.5 * vect.max()) ** 2))
+        self.profile = bd.ones(vect.shape)
+        # print(self.profile.shape)
         self.profile /= self.profile.sum()
         self.profile *= self.amplitude
 

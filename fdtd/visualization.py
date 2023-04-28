@@ -10,15 +10,15 @@ import os
 
 # plotting
 import matplotlib
-matplotlib.use('TkAgg',force=True)
+# matplotlib.use('TkAgg',force=True)
 import matplotlib.pyplot as plt
-print("Switched to:",matplotlib.get_backend())
+# print("Switched to:",matplotlib.get_backend())
 import matplotlib.patches as ptc
 from matplotlib.colors import LogNorm
 
 # 3rd party
 from tqdm import tqdm
-from numpy import log10, where
+from numpy import log10, where, power
 from scipy.signal import hilbert  # TODO: Write hilbert function to replace using scipy
 
 # relative
@@ -29,22 +29,22 @@ from .backend import backend as bd
 
 
 def visualize(
-    grid,
-    x=None,
-    y=None,
-    z=None,
-    cmap="Blues",
-    pbcolor="C3",
-    pmlcolor=(0, 0, 0, 0.1),
-    objcolor=(1, 0, 0, 0.1),
-    srccolor="C0",
-    detcolor="C2",
-    norm="linear",
-    show=False,  # default False to allow animate to be true
-    animate=False,  # True to see frame by frame states of grid while running simulation
-    index=None,  # index for each frame of animation (visualize fn runs in a loop, loop variable is passed as index)
-    save=False,  # True to save frames (requires parameters index, folder)
-    folder=None,  # folder path to save frames
+        grid,
+        x=None,
+        y=None,
+        z=None,
+        cmap="Blues",
+        pbcolor="C3",
+        pmlcolor=(0, 0, 0, 0.1),
+        objcolor=(1, 0, 0, 0.1),
+        srccolor="C0",
+        detcolor="C2",
+        norm="linear",
+        show=False,  # default False to allow animate to be true
+        animate=False,  # True to see frame by frame states of grid while running simulation
+        index=None,  # index for each frame of animation (visualize fn runs in a loop, loop variable is passed as index)
+        save=False,  # True to save frames (requires parameters index, folder)
+        folder=None,  # folder path to save frames
 ):
     """visualize a projection of the grid and the optical energy inside the grid
 
@@ -331,6 +331,55 @@ def visualize(
         plt.show()
 
 
+def intensity_map_2D(block_det, choose_axis=2, interpolation="spline16"):
+    """
+    Displays detector readings from an 'fdtd.BlockDetector' in a decibel map spanning a 2D slice region inside the BlockDetector.
+    Compatible with continuous sources (not pulse).
+    Currently, only x-y 2D plot slices are accepted.
+
+    Parameter:-
+        block_det (numpy array): 5 axes numpy array (timestep, row, column, height, {x, y, z} parameter) created by 'fdtd.BlockDetector'.
+        (optional) choose_axis (int): Choose between {0, 1, 2} to display {x, y, z} data. Default 2 (-> z).
+        (optional) interpolation (string): Preferred 'matplotlib.pyplot.imshow' interpolation. Default "spline16".
+    """
+    if block_det is None:
+        raise ValueError(
+            "Function 'intensity_map' requires a detector_readings object as parameter."
+        )
+    if len(block_det.shape) != 5:  # BlockDetector readings object have 5 axes
+        raise ValueError(
+            "Function 'intensity_map' requires object of readings recorded by 'fdtd.BlockDetector'."
+        )
+
+    # TODO: convert all 2D slices (y-z, x-z plots) into x-y plot data structure
+
+    plt.ioff()
+    plt.close()
+    a = []  # array to store wave intensities
+    for i in tqdm(range(len(block_det[0]))):
+        a.append([])
+        for j in range(len(block_det[0][0])):
+            temp = [x[i][j][0][choose_axis] for x in block_det]
+            a[i].append(max(temp) - min(temp))
+
+    peakVal, minVal = max(map(max, a)), min(map(min, a))
+    print(
+        "Peak at:",
+        [
+            [[i, j] for j, y in enumerate(x) if y == peakVal]
+            for i, x in enumerate(a)
+            if peakVal in x
+        ],
+    )
+    # a = 10 * log10([[y / minVal for y in x] for x in a])
+    a = power([[y / minVal for y in x] for x in a], 2)
+    plt.title("Intensity map in detector region")
+    plt.imshow(a, cmap="inferno")  # , interpolation=interpolation)
+    cbar = plt.colorbar()
+    cbar.ax.set_ylabel("Intensity scale", rotation=270)
+    plt.show()
+
+
 def dB_map_2D(block_det=None, choose_axis=2, interpolation="spline16"):
     """
     Displays detector readings from an 'fdtd.BlockDetector' in a decibel map spanning a 2D slice region inside the BlockDetector.
@@ -371,10 +420,9 @@ def dB_map_2D(block_det=None, choose_axis=2, interpolation="spline16"):
             if peakVal in x
         ],
     )
-    # a = 10 * log10([[y / minVal for y in x] for x in a])
-    a = ([[y / minVal for y in x] for x in a])**2
+    a = 10 * log10([[y / minVal for y in x] for x in a])
 
-    plt.title("dB map of Electrical waves in detector regio")
+    plt.title("dB map of Electrical waves in detector region")
     plt.imshow(a, cmap="inferno", interpolation=interpolation)
     cbar = plt.colorbar()
     cbar.ax.set_ylabel("dB scale", rotation=270)
@@ -469,7 +517,6 @@ def plot_detection(detector_dict=None, specific_plot=None):
         plt.legend()
         plt.suptitle("Time-of-arrival plot")
     plt.show()
-
 
 #
 # def dump_to_vtk(pcb, filename, iteration, Ex_dump=False, Ey_dump=False, Ez_dump=False, Emag_dump=True, objects_dump=True, ports_dump=True):

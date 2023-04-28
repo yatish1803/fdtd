@@ -1,7 +1,7 @@
-import os
+# import os
 import fdtd
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 grid = fdtd.Grid(shape=(260, 15.5e-6, 1), grid_spacing=77.5e-9)
 # x boundaries
@@ -10,8 +10,8 @@ grid[-10:, :, :] = fdtd.PML(name="pml_xhigh")
 # y boundaries
 grid[:, 0:10, :] = fdtd.PML(name="pml_ylow")
 grid[:, -10:, :] = fdtd.PML(name="pml_yhigh")
-simfolder = grid.save_simulation("Lenses")  # initializing environment to save simulation data
-print(simfolder)
+# simfolder = grid.save_simulation("Lenses")  # initializing environment to save simulation data
+# print(simfolder)
 
 x, y = np.arange(-200, 200, 1), np.arange(190, 200, 1)
 X, Y = np.meshgrid(x, y)
