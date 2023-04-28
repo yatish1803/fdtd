@@ -81,10 +81,10 @@ permittivity += slice2D[:, :, None] * (n_m ** 2 - n_s ** 2)
 grid[20+gap_x:20+gap_x+permittivity.shape[0], 10+gap_y:10+gap_y+permittivity.shape[1], 0] = fdtd.Object(permittivity=permittivity, name="object")
 
 grid.run(total_time=200)
-# grid.save_data()  # saving detector readings
+grid.save_data()  # saving detector readings
 grid.visualize(z=0, show=True)
 # plt.show()
 # globals().clear()
 
 # df = np.load(os.path.join(simfolder, "detector_readings.npz"))
-# fdtd.intensity_map_2D(df["detector (E)"])
+# fdtd.intensity_map_2D(df["detector (E)"], permittivity, vel_light)

@@ -18,7 +18,7 @@ from matplotlib.colors import LogNorm
 
 # 3rd party
 from tqdm import tqdm
-from numpy import log10, where, power
+from numpy import log10, where, power, squeeze
 from scipy.signal import hilbert  # TODO: Write hilbert function to replace using scipy
 
 # relative
@@ -331,7 +331,7 @@ def visualize(
         plt.show()
 
 
-def intensity_map_2D(block_det, choose_axis=2, interpolation="spline16"):
+def intensity_map_2D(block_det, permittivity, c, choose_axis=2, interpolation="spline16"):
     """
     Displays detector readings from an 'fdtd.BlockDetector' in a decibel map spanning a 2D slice region inside the BlockDetector.
     Compatible with continuous sources (not pulse).
@@ -372,7 +372,7 @@ def intensity_map_2D(block_det, choose_axis=2, interpolation="spline16"):
         ],
     )
     # a = 10 * log10([[y / minVal for y in x] for x in a])
-    a = power([[y / minVal for y in x] for x in a], 2)
+    a = 0.5 * squeeze(permittivity) * c * power([[y / minVal for y in x] for x in a], 2)
     plt.title("Intensity map in detector region")
     plt.imshow(a, cmap="inferno")  # , interpolation=interpolation)
     cbar = plt.colorbar()
