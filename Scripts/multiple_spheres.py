@@ -35,7 +35,6 @@ volume = new_func.place_spheres_in_volume(volume, positions, diameter_spheres)
 
 # take a slice of the volume along the z-axis
 slice2D = volume[:, dim_y // 2, :]
-slice2D.shape
 
 # display the slice using matplotlib
 plt.imshow(slice2D, cmap='gray')
@@ -85,12 +84,15 @@ grid[20+gap_x:20+gap_x+permittivity.shape[0], 20+gap_y:20+gap_y+permittivity.sha
 grid.run(total_time=400)
 grid.save_data()  # saving detector readings
 grid.visualize(z=0, show=True)
-# plt.show()
+
 # globals().clear()
 
 permittivity_det_zone = np.ones((sx+1, sy+1)) * n_s ** 2
 permittivity_det_zone[gap_x:gap_x+permittivity.shape[0], gap_y:gap_y+permittivity.shape[1]] = np.squeeze(permittivity)
 
 df = np.load(os.path.join(simfolder, "detector_readings.npz"))
-# fdtd.dB_map_2D(df["detector (E)"])
-fdtd.intensity_map_2D(df["detector (E)"], permittivity_det_zone, vel_light)
+fdtd.dB_map_2D(df["detector (E)"])
+# fdtd.intensity_map_2D(df["detector (E)"], permittivity_det_zone, vel_light)
+
+fdtd.intensity_map(df["detector (E)"], df["detector (H)"], permittivity_det_zone, vel_light)
+

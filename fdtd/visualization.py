@@ -18,7 +18,8 @@ from matplotlib.colors import LogNorm
 
 # 3rd party
 from tqdm import tqdm
-from numpy import log10, where, power, squeeze
+import numpy as np
+from numpy import log10, where, power
 from scipy.signal import hilbert  # TODO: Write hilbert function to replace using scipy
 
 # relative
@@ -119,7 +120,8 @@ def visualize(
     plt.plot([], lw=3, color=detcolor, label="Detectors")
 
     # Grid energy
-    grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)
+    grid_energy = bd.sum(grid.E ** 2 + grid.H ** 2, -1)  # energy density of EM wave (sum of the electric field energy
+    # density and magnetic field energy density).
     if x is not None:
         assert grid.Ny > 1 and grid.Nz > 1
         xlabel, ylabel = "y", "z"
@@ -381,6 +383,31 @@ def intensity_map_2D(block_det, permittivity, c, choose_axis=2, interpolation="s
     plt.show()
 
 
+def intensity_map(block_det_E, block_det_H, permittivity, c, interpolation="spline36"):
+    # Calculate instantaneous Poynting vector
+    S_inst = np.cross(block_det_E, block_det_H, axisa=-1, axisb=-1)
+
+    # Calculate time-averaged Poynting vector
+    S_avg = np.mean(S_inst, axis=0)
+
+    # Calculate maximum electric field amplitude
+    E_norm = np.linalg.norm(block_det_E, axis=-1)  # norm of E-field vector
+    E_max = np.max(E_norm)  # maximum E-field amplitude over all space and time
+
+    # Calculate time-averaged power per unit area
+    power_density = np.linalg.norm(S_avg, axis=-1) / 2.0
+
+    # Calculate intensity map
+    intensity = power_density  # / (0.5 * c * permittivity * E_max ** 2)
+    intensity_central_slice = np.squeeze(intensity[:, :, int(intensity.shape[2]/2)])
+
+    plt.title("Intensity map in detector region")
+    plt.imshow(intensity_central_slice, cmap="bwr", alpha=0.9, interpolation=interpolation)
+    cbar = plt.colorbar()
+    cbar.ax.set_ylabel("Intensity scale", rotation=270)
+    plt.show()
+
+
 def dB_map_2D(block_det=None, choose_axis=2, interpolation="spline16"):
     """
     Displays detector readings from an 'fdtd.BlockDetector' in a decibel map spanning a 2D slice region inside the BlockDetector.
@@ -412,7 +439,7 @@ def dB_map_2D(block_det=None, choose_axis=2, interpolation="spline16"):
             temp = [x[i][j][0][choose_axis] for x in block_det]
             a[i].append(max(temp) - min(temp))
 
-    peakVal, minVal = max(map(max, a)), min(map(min, a))
+    peakVal, minVal = max(map(max, a)), min(map(min, a))  # map 'min' on each element in 'a'
     # print(
     #     "Peak at:",
     #     [
