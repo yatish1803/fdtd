@@ -11,4 +11,4 @@ from .boundaries import PeriodicBoundary, PML
 from .backend import backend
 from .backend import set_backend
 from .fourier import FrequencyRoutines
-from .visualization import dB_map_2D, plot_detection, intensity_map_2D, intensity_map
+from .visualization import dB_map_2D, plot_detection, intensity_map_2D, intensity_map, intensity_map_new

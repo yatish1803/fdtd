@@ -383,26 +383,61 @@ def intensity_map_2D(block_det, permittivity, c, choose_axis=2, interpolation="s
     plt.show()
 
 
-def intensity_map(block_det_E, block_det_H, permittivity, c, interpolation="spline36"):
+def intensity_map(block_det_E, block_det_H, permittivity, c, interpolation=None):
+    # from https://doi.org/10.1016/j.aml.2018.08.020
+    # Get S = E x H, then Get norm of this S vector, then integrate S_norm wrt time from 0 to t, where t=T.dt
     # Calculate instantaneous Poynting vector
-    S_inst = np.cross(block_det_E, block_det_H, axisa=-1, axisb=-1)
+    S_inst = np.cross(block_det_E, block_det_H, axisa=-1, axisb=-1)  # shape = (timestep, row, column, height, 3)
 
     # Calculate time-averaged Poynting vector
-    S_avg = np.mean(S_inst, axis=0)
+    S_avg = np.mean(S_inst, axis=0)  # shape = (row, column, height, 3)
 
-    # Calculate maximum electric field amplitude
-    E_norm = np.linalg.norm(block_det_E, axis=-1)  # norm of E-field vector
-    E_max = np.max(E_norm)  # maximum E-field amplitude over all space and time
+    # # Calculate maximum electric field amplitude
+    # E_norm = np.linalg.norm(block_det_E, axis=-1)  # norm of E-field vector
+    # E_max = np.max(E_norm)  # maximum E-field amplitude over all space and time
 
     # Calculate time-averaged power per unit area
-    power_density = np.linalg.norm(S_avg, axis=-1) / 2.0
+    power_density = np.linalg.norm(S_avg, axis=-1) / 2.0  # shape = (row, column, height)
 
     # Calculate intensity map
     intensity = power_density  # / (0.5 * c * permittivity * E_max ** 2)
     intensity_central_slice = np.squeeze(intensity[:, :, int(intensity.shape[2]/2)])
 
     plt.title("Intensity map in detector region")
-    plt.imshow(intensity_central_slice, cmap="bwr", alpha=0.9, interpolation=interpolation)
+    plt.imshow(intensity_central_slice, cmap="inferno", alpha=0.9, interpolation=interpolation)
+    cbar = plt.colorbar()
+    cbar.ax.set_ylabel("Intensity scale", rotation=270)
+    plt.show()
+
+
+def intensity_map_new(block_det_E, block_det_H, dt=1.0, interpolation=None):
+    """
+    from https://doi.org/10.1016/j.aml.2018.08.020
+    Get S = E x H
+    then Get norm of this S vector,
+    then integrate S_norm wrt time(dt) from 0 to t, where t=T.dt
+    """
+    # Calculate instantaneous Poynting vector
+    S_inst = np.cross(block_det_E, block_det_H, axisa=-1, axisb=-1)  # shape = (timestep, row, column, height, 3)
+
+    # Calculate time-averaged power per unit area
+    norm_S = np.linalg.norm(S_inst, axis=-1)  # shape = (timestep, row, column, height)
+
+    # Calculate intensity map
+    T = norm_S.shape[0]  # number of time steps
+    intensity = np.zeros((norm_S.shape[1], norm_S.shape[2], norm_S.shape[3]))  # initialize energy array
+
+    for i in range(norm_S.shape[1]):  # loop over z-dimension
+        for j in range(norm_S.shape[2]):  # loop over y-dimension
+            for k in range(norm_S.shape[3]):  # loop over x-dimension
+                # trapezoidal integration
+                x = np.trapz(norm_S[:, i, j, k], dx=dt)
+                intensity[i, j, k] = x
+
+    intensity_central_slice = np.squeeze(intensity[:, :, int(intensity.shape[2] / 2)])
+
+    plt.title("Intensity map in detector region")
+    plt.imshow(intensity_central_slice, cmap="inferno", alpha=0.9, interpolation=interpolation)
     cbar = plt.colorbar()
     cbar.ax.set_ylabel("Intensity scale", rotation=270)
     plt.show()

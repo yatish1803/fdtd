@@ -20,8 +20,8 @@ dim_z = 100
 volume = np.zeros((dim_x, dim_y, dim_z), dtype=int)
 
 # generate positions for N non-overlapping spheres
-volume_fraction = 0.5
-diameter_spheres = 28
+volume_fraction = 0.7
+diameter_spheres = 14
 
 positions = new_func.generate_sphere_positions(volume, volume_fraction, diameter_spheres, dim_x, dim_y, dim_z)
 
@@ -94,5 +94,6 @@ df = np.load(os.path.join(simfolder, "detector_readings.npz"))
 fdtd.dB_map_2D(df["detector (E)"])
 # fdtd.intensity_map_2D(df["detector (E)"], permittivity_det_zone, vel_light)
 
-fdtd.intensity_map(df["detector (E)"], df["detector (H)"], permittivity_det_zone, vel_light)
+# fdtd.intensity_map(df["detector (E)"], df["detector (H)"], permittivity_det_zone, vel_light)
+fdtd.intensity_map_new(df["detector (E)"], df["detector (H)"])
 
