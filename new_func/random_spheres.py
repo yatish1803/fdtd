@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from mayavi import mlab
 
 
@@ -38,5 +39,31 @@ def place_spheres_in_volume(volume, positions, diameter_px):
                 for k in range(-diameter_px//2, diameter_px//2 + 1):
                     if np.linalg.norm(np.array([i, j, k])) <= diameter_px//2:
                         volume[x + i, y + j, z + k] = 1
+
+    return volume
+
+
+def generate_Volume_Binary(diameter_spheres, volume_fraction, dim_x, dim_y, dim_z):
+
+    # create an empty 3D numpy array
+    volume = np.zeros((dim_x, dim_y, dim_z), dtype=int)
+
+    # generate positions for N non-overlapping spheres
+    positions = generate_sphere_positions(volume, volume_fraction, diameter_spheres, dim_x, dim_y, dim_z)
+
+    # place the spheres in the 3D volume
+    volume = place_spheres_in_volume(volume, positions, diameter_spheres)
+
+    # # display the 3D volume with the spheres
+    # mlab.figure(bgcolor=(0, 0, 0), size=(800, 800))
+    # mlab.contour3d(volume, contours=[0.5], transparent=True)
+    # mlab.show()
+
+    # take a slice of the volume along the z-axis
+    slice2D = volume[:, dim_y // 2, :]
+
+    # display the slice using matplotlib
+    plt.imshow(slice2D, cmap='gray')
+    plt.show()
 
     return volume
