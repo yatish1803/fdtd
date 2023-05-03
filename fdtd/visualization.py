@@ -330,6 +330,8 @@ def visualize(
 
     # show if not animating
     if show:
+        my_file = 'energy_density.png'
+        plt.savefig(os.path.join(folder, my_file))
         plt.show()
 
 
@@ -360,7 +362,7 @@ def visualize(
 #     plt.show()
 
 
-def intensity_map(block_det_E, block_det_H, dt=1.0, interpolation=None):
+def intensity_map(block_det_E, block_det_H, dt=1.0, interpolation=None, folder=None):
     """
     from https://doi.org/10.1016/j.aml.2018.08.020
     Get S = E x H
@@ -390,10 +392,14 @@ def intensity_map(block_det_E, block_det_H, dt=1.0, interpolation=None):
     plt.imshow(intensity_central_slice, cmap="inferno", alpha=0.9, interpolation=interpolation)
     cbar = plt.colorbar()
     cbar.ax.set_ylabel("Intensity scale", rotation=270)
-    plt.show()
+
+    if folder is not None:
+        my_file = 'intensity_map.png'
+        plt.savefig(os.path.join(folder, my_file))
+        plt.show()
 
 
-def dB_map_2D(block_det=None, choose_axis=2, interpolation="spline16"):
+def dB_map_2D(block_det=None, choose_axis=2, interpolation="spline16", folder=None):
     """
     Displays detector readings from an 'fdtd.BlockDetector' in a decibel map spanning a 2D slice region inside the BlockDetector.
     Compatible with continuous sources (not pulse).
@@ -439,7 +445,11 @@ def dB_map_2D(block_det=None, choose_axis=2, interpolation="spline16"):
     plt.imshow(a, cmap="inferno", interpolation=interpolation)
     cbar = plt.colorbar()
     cbar.ax.set_ylabel("dB scale", rotation=270)
-    plt.show()
+
+    if folder is not None:
+        my_file = 'dB_map.png'
+        plt.savefig(os.path.join(folder, my_file))
+        plt.show()
 
 
 def plot_detection(detector_dict=None, specific_plot=None):
