@@ -12,7 +12,6 @@ sy = 256
 
 fdtd.set_backend("numpy")
 
-# In[3]:
 
 wavelength_freespace = 491e-9
 vel_light: float = 299_792_458.0  # [m/s] speed of light
