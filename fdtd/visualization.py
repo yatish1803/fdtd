@@ -19,6 +19,9 @@ from matplotlib.colors import LogNorm
 # 3rd party
 from tqdm import tqdm
 import numpy as np
+from scipy.io import savemat
+from numpy import savez
+# from numba import jit
 from numpy import log10, where, power
 from scipy.signal import hilbert  # TODO: Write hilbert function to replace using scipy
 
@@ -379,9 +382,10 @@ def intensity_map(block_det_E, block_det_H, dt=1.0, interpolation=None, folder=N
     T = norm_S.shape[0]  # number of time steps
     intensity = bd.zeros((norm_S.shape[1], norm_S.shape[2], norm_S.shape[3]))  # initialize energy array
 
-    for i in range(norm_S.shape[1]):  # loop over z-dimension
+    for i in tqdm(range(norm_S.shape[1])):  # loop over z-dimension
         for j in range(norm_S.shape[2]):  # loop over y-dimension
             for k in range(norm_S.shape[3]):  # loop over x-dimension
+                print()
                 # trapezoidal integration
                 x = np.trapz(norm_S[:, i, j, k], dx=dt)
                 intensity[i, j, k] = x
@@ -389,12 +393,25 @@ def intensity_map(block_det_E, block_det_H, dt=1.0, interpolation=None, folder=N
     intensity_central_slice = np.squeeze(intensity[:, :, int(intensity.shape[2] / 2)])
 
     plt.title("Intensity map in detector region")
-    plt.imshow(intensity_central_slice, cmap="inferno", alpha=0.9, interpolation=interpolation)
+    plt.imshow(intensity_central_slice, cmap="inferno", interpolation=interpolation)
     cbar = plt.colorbar()
     cbar.ax.set_ylabel("Intensity scale", rotation=270)
 
     if folder is not None:
         my_file = 'intensity_map.png'
+        plt.savefig(os.path.join(folder, my_file))
+    #     plt.show()
+
+    # line_profile = np.sum(intensity_central_slice, axis=0)
+    line_profile = intensity_central_slice[100, :]
+    mdic = {"line_profile": line_profile}
+    savemat(os.path.join(folder, "line_profile_fdtd.mat"), mdic)
+
+    plt.title("Intensity line-profile along propagation direction")
+    plt.plot(line_profile)
+
+    if folder is not None:
+        my_file = 'intensity_line-profile.png'
         plt.savefig(os.path.join(folder, my_file))
         plt.show()
 
