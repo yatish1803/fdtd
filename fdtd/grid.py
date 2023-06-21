@@ -17,7 +17,8 @@ from datetime import datetime
 # 3rd party
 from tqdm import tqdm
 from numpy import savez
-
+# from numba import jit, njit
+# import numpy as np
 # typing
 from .typing_ import Tuple, Number, Tensorlike
 
@@ -26,7 +27,7 @@ from .backend import backend as bd
 from . import constants as const
 
 
-## Functions
+# Functions
 def curl_E(E: Tensorlike) -> Tensorlike:
     """Transforms an E-type field into an H-type field by performing a curl
     operation
@@ -75,6 +76,58 @@ def curl_H(H: Tensorlike) -> Tensorlike:
     curl[:, 1:, :, 2] -= H[:, 1:, :, 0] - H[:, :-1, :, 0]
 
     return curl
+
+#
+# @njit
+# def curl_E(E: np.ndarray) -> np.ndarray:
+#     """Transforms an E-type field into an H-type field by performing a curl
+#     operation
+#
+#     Args:
+#         E: Electric field to take the curl of (E-type field located on the
+#            edges of the grid cell [integer gridpoints])
+#
+#     Returns:
+#         The curl of E (H-type field located on the faces of the grid [half-integer grid points])
+#     """
+#     curl = np.zeros(E.shape)
+#
+#     curl[:, :-1, :, 0] += E[:, 1:, :, 2] - E[:, :-1, :, 2]
+#     curl[:, :, :-1, 0] -= E[:, :, 1:, 1] - E[:, :, :-1, 1]
+#
+#     curl[:, :, :-1, 1] += E[:, :, 1:, 0] - E[:, :, :-1, 0]
+#     curl[:-1, :, :, 1] -= E[1:, :, :, 2] - E[:-1, :, :, 2]
+#
+#     curl[:-1, :, :, 2] += E[1:, :, :, 1] - E[:-1, :, :, 1]
+#     curl[:, :-1, :, 2] -= E[:, 1:, :, 0] - E[:, :-1, :, 0]
+#
+#     return curl
+#
+#
+# @njit
+# def curl_H(H: np.ndarray) -> np.ndarray:
+#     """Transforms an H-type field into an E-type field by performing a curl
+#     operation
+#
+#     Args:
+#         H: Magnetic field to take the curl of (H-type field located on half-integer grid points)
+#
+#     Returns:
+#         The curl of H (E-type field located on the edges of the grid [integer grid points])
+#
+#     """
+#     curl = np.zeros(H.shape)
+#
+#     curl[:, 1:, :, 0] += H[:, 1:, :, 2] - H[:, :-1, :, 2]
+#     curl[:, :, 1:, 0] -= H[:, :, 1:, 1] - H[:, :, :-1, 1]
+#
+#     curl[:, :, 1:, 1] += H[:, :, 1:, 0] - H[:, :, :-1, 0]
+#     curl[1:, :, :, 1] -= H[1:, :, :, 2] - H[:-1, :, :, 2]
+#
+#     curl[1:, :, :, 2] += H[1:, :, :, 1] - H[:-1, :, :, 1]
+#     curl[:, 1:, :, 2] -= H[:, 1:, :, 0] - H[:, :-1, :, 0]
+#
+#     return curl
 
 
 ## FDTD Grid Class
