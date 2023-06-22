@@ -47,11 +47,6 @@ grid[b2s:b2pml + pml2d + sx + pml2d + b2pml - b2s, 10, 0] = fdtd.LineSource(
     period=time_step, name="source"
 )
 
-if save:
-    simfolder = grid.save_simulation("Multi_Sphere")  # initializing environment to save simulation data
-    print(simfolder)
-else:
-    simfolder = None
 
 Single_Sphere = True
 #################### for multiple spheres #################
